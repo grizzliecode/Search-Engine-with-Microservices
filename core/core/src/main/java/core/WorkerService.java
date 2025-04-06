@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -19,7 +21,7 @@ public class WorkerService {
     private final String configFile = ".\\config.json";
     private final String startCommand = ".\\startWorker.ps1";
     private List<WorkerConfiguration> workers;
-    
+
     @PreDestroy
     public void stopWorkers() {
         RestTemplate restTemplate = new RestTemplate();
@@ -48,6 +50,7 @@ public class WorkerService {
             try {
                 String[] command = {"powershell.exe", "-ExecutionPolicy", "Bypass", "-File", startCommand, Integer.toString(worker.getPort()), worker.getBase_dir()};
                 Process startProcess = Runtime.getRuntime().exec(command);
+                System.out.println("Started process:" + Arrays.toString(command));
             } catch (IOException e) {
                 System.out.println(e.getMessage());
                 throw new RuntimeException(e);
